@@ -1498,4 +1498,53 @@ describe('[core]', () => {
       },
     });
   });
+
+  // test for #276
+  it('correct position if offset parent has borders', done => {
+    jasmineWrapper.innerHTML = `
+      <style>
+        table {
+          margin-top: 50px;
+        }
+        #reference {
+          background: orange;
+          width: 50px;
+          height: 50px;
+        }
+        #popper {
+          background: green;
+          width: 50px;
+          height: 50px;
+        }
+      </style>
+      <table>
+        <tbody>
+          <tr>
+            <td>
+              <div id="reference">
+                ref
+              </div>
+              <div id="popper">
+                pop
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    `;
+
+    const reference = document.getElementById('reference');
+    const popper = document.getElementById('popper');
+
+    new Popper(reference, popper, {
+      placement: 'bottom',
+      onCreate(data) {
+        expect(getRect(reference).bottom).toBeApprox(getRect(popper).top);
+        expect(getRect(reference).left).toBeApprox(getRect(popper).left);
+        data.instance.destroy();
+        done();
+      },
+    });
+  });
+
 });
